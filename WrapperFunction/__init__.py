@@ -1,85 +1,27 @@
+# noinspection PyUnresolvedReferences
 import azure.functions as func
-from pydantic import BaseModel
 from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse, JSONResponse
 import requests
 from requests import JSONDecodeError
-from datetime import datetime
 from dotenv import load_dotenv
 import os
+from WrapperFunction.models.value_only import ValueOnly
+from WrapperFunction.models.value_desc import ValueDesc
+from WrapperFunction.models.parameter import Parameter
+from WrapperFunction.models.user_block import UserBlock
+from WrapperFunction.models.user_role import UserRole
+from WrapperFunction.models.patron import Patron
+from WrapperFunction.models.exceptions import MessageException, SendException
 
+# Load env vars from .env
 load_dotenv()
-
 doc_message = os.getenv('DOC_MESSAGE')
 endpoint = os.getenv('ENDPOINT')
 static_params = eval(os.getenv('STATIC_PARAMS'))
 api_keys = eval(os.getenv('API_KEYS'))
 
-
-# Create custom exception class
-class MessageException(Exception):
-    def __init__(self, code: int, message: str):
-        self.code: int = code
-        self.message: str = message
-
-
-# SendException class
-class SendException(Exception):
-    def __init__(self, code: int, body: str):
-        self.code: int = code
-        self.body: str = body
-
-
 fastapi_app = FastAPI()  # Init FastAPI app
-
-
-# Simple value-only object
-class ValueOnly(BaseModel):
-    value: str = None
-
-
-# Simple value-description object
-class ValueDesc(BaseModel):
-    value: str = None
-    desc: str = None
-
-
-# User role parameter object
-class Parameter(BaseModel):
-    type: ValueOnly = None
-    scope: ValueDesc = None
-    value: ValueDesc = None
-
-
-# User block object
-class UserBlock(BaseModel):
-    block_type: ValueDesc = None
-    block_description: ValueDesc = None
-    block_status: str = None
-    block_note: str = None
-    created_by: str = None
-    created_date: datetime = None
-    expiry_date: datetime = None
-    item_loan_id: str = None
-    block_owner: str = None
-
-
-# User role object
-class UserRole(BaseModel):
-    status: ValueDesc = None
-    scope: ValueDesc = None
-    role_type: ValueDesc = None
-    parameter: list[Parameter] = None
-
-
-# Patron object (top-level)
-class Patron(BaseModel):
-    primary_id: str
-    full_name: str
-    user_group: ValueDesc = None
-    user_role: list[UserRole] = None
-    status: ValueDesc
-    user_block: list[UserBlock] = None
 
 
 # Error handler for MessageException
@@ -104,13 +46,13 @@ async def send_exception_handler(reqeust: Request, exc: SendException):
 
 # Home page
 @fastapi_app.get("/")
-async def root():
+async def root() -> RedirectResponse:
     return RedirectResponse("/lookup")  # redirect to app
 
 
 # Lookup route
 @fastapi_app.get("/lookup")
-async def lookup():
+async def lookup() -> dict:
     return {"message": doc_message}  # return message from settings.py
 
 
