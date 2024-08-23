@@ -5,7 +5,15 @@ from fastapi.responses import RedirectResponse, JSONResponse
 import requests
 from requests import JSONDecodeError
 from datetime import datetime
-from WrapperFunction.settings import api_keys, endpoint, static_params, doc_message
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+doc_message = os.getenv('DOC_MESSAGE')
+endpoint = os.getenv('ENDPOINT')
+static_params = eval(os.getenv('STATIC_PARAMS'))
+api_keys = eval(os.getenv('API_KEYS'))
 
 
 # Create custom exception class
