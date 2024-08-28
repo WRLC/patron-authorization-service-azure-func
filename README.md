@@ -13,12 +13,14 @@ FastAPI MS Azure Function App for retrieving patron info, including user_role an
 
 1. Clone the repo: `git clone git@github.com:WRLC/patron-authorization-service-azure-func.git`
 2. `cd` into the repo's root directory: `cd patron-authorization-service-azure-func`
-2. Copy the app .env file: `cp WrapperFunction/.env.template WrapperFunction/.env`
-3. Edit `WrapperFunction/.env` to add an Alma API `'key': 'value'` pair for each institution zone (IZ) to the `API_KEYS` environment variable
+3. Create and activate Python virtual environment: `python -m venv .venv` and `source .venv/bin/activate`
+4. Install requirements: `pip install -r requirements.txt`
+5. Copy the app .env file: `cp WrapperFunction/.env.template WrapperFunction/.env`
+6. Edit `WrapperFunction/.env` to add an Alma API `'key': 'value'` pair for each institution zone (IZ) to the `API_KEYS` environment variable
    * `'key'` = an short code for the IZ; this doesn't need to match anything in Alma, but it will be the value of the 'inst' paremeter in request URLs
    * `'value'` = a working Alma Users API key with read privileges for the IZ (set up in the [Ex Libris Developer Network](https://developers.exlibrisgroup.com/))
-4. Run the app: `func start`
-5. Access the test endpoint to verify it's working: http://localhost:7071/lookup
+7. Run the app: `func start`
+8. Access the test endpoint to verify it's working: http://localhost:7071/lookup
 
 ## Patron Lookup
 
