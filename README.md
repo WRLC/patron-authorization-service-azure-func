@@ -102,6 +102,12 @@ If the API key in `WrapperFunction/.env` is valid and a user matches the unique 
 }
 ```
 
+## API documentation
+
+Because this is a FastAPI app, API documentation is generated automatically in two formats:
+* Swagger UI (interactive): http://localhost:7071/docs
+* ReDoc (non-interactive): http://localhost:7071/redoc
+
 ## Deployment
 
 Using Visual Studio Code simplifies deployment. First you need to create a Function App in Azure. From [Microsoft's documentation](https://learn.microsoft.com/en-us/azure/azure-functions/functions-develop-vs-code?tabs=node-v4%2Cpython-v2%2Cisolated-process%2Cquick-create&pivots=programming-language-python#create-an-azure-container-apps-deployment):
