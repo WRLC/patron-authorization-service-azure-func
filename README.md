@@ -123,3 +123,7 @@ You can then get the Patron Authorization App's Azure Function URL by either:
 * In Visual Code Studio:
   1. Select F1 to open the command palette, and then find and run the command Azure Functions: Copy Function URL. 
   2. Follow the prompts to select your function app in Azure and then the specific HTTP trigger that you want to invoke
+
+## Standalone node.js app
+
+For a standalone node.js version of this app that uses the same request URL structure and JSON response structure, see [WRLC/patron-authorization-service](https://github.com/WRLC/patron-authorization-service)
