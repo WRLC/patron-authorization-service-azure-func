@@ -79,7 +79,7 @@ async def lookup() -> dict:
 
 # Lookup patron
 @fastapi_app.get("/lookup/patron")
-async def patron(inst: str | None = None, uid: str | None = None) -> Patron | MessageException | SendException:
+async def patron(inst: str | None = None, uid: str | None = None) -> Patron:
     """
     Lookup patron by UID.
 
@@ -104,12 +104,12 @@ async def patron(inst: str | None = None, uid: str | None = None) -> Patron | Me
         r.raise_for_status()  # raise HTTP errors as exceptions
 
     except requests.exceptions.RequestException as err:  # If request raised an exception...
-        return MessageException(400, f'Error: {err}')  # ...return a 400 error
+        raise MessageException(400, f'Error: {err}') from err  # ...return a 400 error
 
     try:
         attributes = r.json()  # get the user attributes
     except JSONDecodeError as errj:  # If the response isn't valid json...
-        return SendException(404, errj.response.text)  # ...return a 404 error
+        raise SendException(404, errj.response.text) from errj  # ...return a 404 error
 
     return Patron(
         primary_id=attributes['primary_id'],
