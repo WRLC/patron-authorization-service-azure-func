@@ -44,6 +44,11 @@ watchfiles = "^1.0.1"
 websockets = "^14.1"
 poetry-plugin-export = "^1.8.0"
 
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.1.2"
+pylint = "^3.3.5"
+mypy = "^1.15.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
