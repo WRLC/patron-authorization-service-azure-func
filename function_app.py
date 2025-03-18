@@ -1,3 +1,6 @@
+"""
+Azure Function App for FastAPI
+"""
 import azure.functions as func
 from WrapperFunction import fastapi_app
 
