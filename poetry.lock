@@ -48,14 +48,14 @@ files = [
 
 [[package]]
 name = "azure-functions"
-version = "1.21.3"
+version = "1.22.1"
 description = "Azure Functions for Python"
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "azure-functions-1.21.3.tar.gz", hash = "sha256:c359b9dbd2998c84d8595e31a28ffad4e8ca8dcfb4a3798327f776a67f964351"},
-    {file = "azure_functions-1.21.3-py3-none-any.whl", hash = "sha256:6c45f5e61fe59328c81928a428d43c838e9ead52f1cde1628fcabb372fa10cc8"},
+    {file = "azure-functions-1.22.1.tar.gz", hash = "sha256:235bb2a4e83d911a0bf4db3eec8f072ce6a0d2c2662bf8bc6d1bbe9389f10562"},
+    {file = "azure_functions-1.22.1-py3-none-any.whl", hash = "sha256:ae4e68bb734365ae74bb2f55bd04f33b8a3d83c0e079a394a4c26b378f7b5f6a"},
 ]
 
 [package.extras]
@@ -1873,14 +1873,14 @@ jupyter = ["ipywidgets (>=7.5.1,<9)"]
 
 [[package]]
 name = "rich-toolkit"
-version = "0.12.0"
+version = "0.14.1"
 description = "Rich toolkit for building command-line applications"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "rich_toolkit-0.12.0-py3-none-any.whl", hash = "sha256:a2da4416384410ae871e890db7edf8623e1f5e983341dbbc8cc03603ce24f0ab"},
-    {file = "rich_toolkit-0.12.0.tar.gz", hash = "sha256:facb0b40418010309f77abd44e2583b4936656f6ee5c8625da807564806a6c40"},
+    {file = "rich_toolkit-0.14.1-py3-none-any.whl", hash = "sha256:dc92c0117d752446d04fdc828dbca5873bcded213a091a5d3742a2beec2e6559"},
+    {file = "rich_toolkit-0.14.1.tar.gz", hash = "sha256:9248e2d087bfc01f3e4c5c8987e05f7fa744d00dd22fa2be3aa6e50255790b3f"},
 ]
 
 [package.dependencies]
@@ -2520,4 +2520,4 @@ cffi = ["cffi (>=1.11)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "0a024b3e1c0f961581a18dffb8698c15d3e0c571e0527d7e5a0e03237cc56408"
+content-hash = "312ada3b26b47a2ab88204367403da3cfdc1c3fefa4a216d56c16f64dd8b6924"
