@@ -42,7 +42,7 @@ mdurl==0.1.2
 more-itertools==10.7.0
 msgpack==1.1.0
 mypy==1.15.0
-mypy-extensions==1.0.0
+mypy_extensions==1.1.0
 packaging==24.2
 pbs-installer==2025.3.17
 pipdeptree==2.26.1
