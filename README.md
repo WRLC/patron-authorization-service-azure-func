@@ -1,10 +1,6 @@
 # patron-authorization-service-azure-func
 
-![Flake8](https://github.com/WRLC/patron-authorization-service-azure-func/actions/workflows/flake8.yml/badge.svg?branch=main)&nbsp;
-![mypy](https://github.com/WRLC/patron-authorization-service-azure-func/actions/workflows/mypy.yml/badge.svg?branch=main)&nbsp;
-![Pylint](https://github.com/WRLC/patron-authorization-service-azure-func/actions/workflows/pylint.yml/badge.svg?branch=main)&nbsp;
-
-FastAPI MS Azure Function App for retrieving patron info, including user_role and user_group, from Ex Libris Alma Users API
+FastAPI Azure Functions app for retrieving patron info, including user_role and user_group, from Ex Libris Alma Users API
 
 ## Requirements
 
