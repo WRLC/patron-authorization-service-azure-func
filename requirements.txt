@@ -45,7 +45,7 @@ mypy==1.16.0
 mypy_extensions==1.1.0
 packaging==25.0
 pathspec==0.12.1
-pbs-installer==2025.5.17
+pbs-installer==2025.6.6
 pipdeptree==2.26.1
 pkginfo==1.12.1.2
 platformdirs==4.3.8
