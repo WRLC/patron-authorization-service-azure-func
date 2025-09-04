@@ -2,6 +2,7 @@
 name: Build and Deploy to Azure Function App
 permissions:
   contents: read
+  id-token: write
 
 on:
   push:
