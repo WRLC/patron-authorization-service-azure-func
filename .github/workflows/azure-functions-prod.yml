@@ -1,5 +1,7 @@
 #file: noinspection UndefinedAction,UndefinedParamsPresent
 name: Deploy to Azure Function App
+permissions:
+  contents: read
 
 on:
   push:
