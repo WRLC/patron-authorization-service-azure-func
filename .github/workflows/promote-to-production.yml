@@ -8,53 +8,18 @@ permissions:
   id-token: write
   contents: read
 
-env:
-  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-  ARM_USE_OIDC: true
-  TF_WORKING_DIR: ./terraform
-
-
 jobs:
-  terraform-outputs:
-    runs-on: ubuntu-latest
-    outputs:
-      function_app_name: ${{ steps.get_outputs.outputs.function_app_name }}
-      function_app_resource_group_name: ${{ steps.get_outputs.outputs.function_app_resource_group_name }}
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_wrapper: false
-
-    - name: Get Terraform outputs
-      id: get_outputs
-      working-directory: ${{ env.TF_WORKING_DIR }}
-      run: |
-        terraform init \
-          -backend-config="resource_group_name=${{ secrets.TF_STATE_RG }}" \
-          -backend-config="storage_account_name=${{ secrets.TF_STATE_SA }}" \
-          -backend-config="container_name=${{ secrets.TF_STATE_CONTAINER }}" \
-          -backend-config="key=${{ secrets.TF_STATE_KEY }}"
-
-        FUNCTION_APP_NAME=$(terraform output -raw function_app_name)
-        RG_NAME=$(terraform output -raw function_app_resource_group_name)
-
-        echo "function_app_name=$FUNCTION_APP_NAME" >> $GITHUB_OUTPUT
-        echo "function_app_resource_group_name=$RG_NAME" >> $GITHUB_OUTPUT
-
   promote-to-production:
     runs-on: ubuntu-latest
     environment: production
-    needs: terraform-outputs
+
     env:
-      FUNCTION_APP_NAME: ${{ needs.terraform-outputs.outputs.function_app_name }}
-      RG_NAME: ${{ needs.terraform-outputs.outputs.function_app_resource_group_name }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_USE_OIDC: true
+      FUNCTION_APP_NAME: ${{ secrets.FUNCTION_APP_NAME }}
+      RG_NAME: ${{ secrets.RESOURCE_GROUP_NAME }}
 
     steps:
     - name: Checkout code
