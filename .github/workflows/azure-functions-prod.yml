@@ -8,17 +8,82 @@ on:
     branches: ["main"]
 
 env:
-  AZURE_FUNCTIONAPP_NAME: 'patronauthorizationservice'
-  PYTHON_VERSION: '3.11'
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_USE_OIDC: true
+  TF_VAR_log_analytics_workspace_name: ${{ secrets.LOG_ANALYTICS_WORKSPACE_NAME }}
+  TF_VAR_log_analytics_workspace_rg_name: ${{ secrets.LOG_ANALYTICS_WORKSPACE_RG_NAME }}
+  TF_VAR_resource_group_name: ${{ secrets.RESOURCE_GROUP_NAME }}
+  TF_VAR_location: ${{ secrets.LOCATION }}
+  TF_VAR_service_plan_name: ${{ secrets.SERVICE_PLAN_NAME }}
+  TF_VAR_storage_account_name: ${{ secrets.STORAGE_ACCOUNT_NAME }}
+  TF_VAR_application_insights_name: ${{ secrets.APPLICATION_INSIGHTS_NAME }}
+  TF_VAR_function_app_name: ${{ secrets.FUNCTION_APP_NAME }}
+  TF_VAR_api_keys: ${{ secrets.API_KEYS }}
+  TF_WORKING_DIR: ./terraform
 
 jobs:
-  build:
+  terraform:
+    name: Terraform
     runs-on: ubuntu-latest
+    outputs:
+      function_app_name: ${{ steps.get_outputs.outputs.function_app_name }}
+      function_app_staging_slot_name: ${{ steps.get_outputs.outputs.function_app_staging_slot_name }}
+      function_app_python_version: ${{ steps.get_outputs.outputs.function_app_python_version }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          client-id: ${{ env.ARM_CLIENT_ID }}
+          tenant-id: ${{ env.ARM_TENANT_ID }}
+          subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init \
+            -backend-config="resource_group_name=${{ secrets.TF_STATE_RG }}" \
+            -backend-config="storage_account_name=${{ secrets.TF_STATE_SA }}" \
+            -backend-config="container_name=${{ secrets.TF_STATE_CONTAINER }}" \
+            -backend-config="key=${{ secrets.TF_STATE_KEY }}"
+
+      - name: Terraform Apply
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform apply -auto-approve
+
+      - name: Get Terraform Outputs
+        id: get_outputs
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          APP_NAME=$(terraform output -raw function_app_name)
+          STAGE_SLOT_NAME=$(terraform output -raw function_app_staging_slot_name)
+          PYTHON_VERSION=$(terraform output -raw function_app_python_version)
+          
+          echo "function_app_name=$APP_NAME" >> "$GITHUB_OUTPUT"
+          echo "function_app_staging_slot_name=$STAGE_SLOT_NAME" >> "$GITHUB_OUTPUT"
+          echo "function_app_python_version=$PYTHON_VERSION" >> "$GITHUB_OUTPUT"  
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: terraform
+    env:
+      PYTHON_VERSION: ${{ needs.terraform.outputs.function_app_python_version }}
     steps:
     - name: 'Checkout GitHub Action'
       uses: actions/checkout@v4
 
-    - name: Setup Python ${{ env.PYTHON_VERSION }} Environment
+    - name: Setup Python
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
@@ -33,15 +98,7 @@ jobs:
     - name: Update lock file
       run: poetry lock
 
-    - name: Load cached venv
-      id: cached-poetry-dependencies
-      uses: actions/cache@v3
-      with:
-        path: .venv
-        key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-
-    - name: Install dependencies
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+    - name: Build with Poetry
       run: poetry install --without dev
 
     - name: Create deployment package
@@ -53,7 +110,7 @@ jobs:
         cp function_app.py host.json function-package/ 2>/dev/null || true
         cp local.settings.json function-package/ 2>/dev/null || true
 
-    - name: Create zip package
+    - name: Zip deployment package
       run: |
         cd function-package
         zip -r ../function-app.zip . -x "*.pyc" "__pycache__/*" "*.git*"
@@ -65,20 +122,34 @@ jobs:
         path: function-app.zip
 
   deploy:
+    name: Deploy to Stage
     runs-on: ubuntu-latest
-    needs: build
-    environment: Azure (stage)
+    needs: [terraform, build]
+    environment: staging
+    env:
+      APP_NAME: ${{ needs.terraform.outputs.function_app_name }}
+      SLOT_NAME: ${{ needs.terraform.outputs.function_app_staging_slot_name }}
     steps:
     - name: Download artifact
       uses: actions/download-artifact@v4
       with:
         name: function-app
 
+    - name: Unzip deployment artifact
+      run: unzip function-app.zip -d app
+
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        client-id: ${{ env.ARM_CLIENT_ID }}
+        tenant-id: ${{ env.ARM_TENANT_ID }}
+        subscription-id: ${{ env.ARM_SUBSCRIPTION_ID }}
+
     - name: 'Deploy to Azure Functions'
       uses: Azure/functions-action@v1
       with:
-        app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
-        package: function-app.zip
-        publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+        app-name: ${{ env.APP_NAME }}
+        slot-name: ${{ env.SLOT_NAME }}
+        package: 'app'
         scm-do-build-during-deployment: false
         enable-oryx-build: false
