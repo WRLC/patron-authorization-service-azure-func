@@ -57,7 +57,7 @@ jobs:
         zip -r ../function-app.zip . -x "*.pyc" "__pycache__/*" "*.git*"
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: function-app
         path: function-app.zip
@@ -68,7 +68,7 @@ jobs:
     environment: Azure (stage)
     steps:
     - name: Download artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: function-app
 
