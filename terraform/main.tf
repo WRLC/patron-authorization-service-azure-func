@@ -58,7 +58,6 @@ resource "azurerm_linux_function_app" "main" {
     application_insights_key = azurerm_application_insights.main.instrumentation_key
     ftps_state = "FtpsOnly"
     http2_enabled = true
-    ip_restriction_default_action = "Deny"
 
     application_stack {
       python_version = "3.11"
@@ -110,7 +109,6 @@ resource "azurerm_linux_function_app_slot" "stage" {
     application_insights_key = azurerm_application_insights.main.instrumentation_key
     ftps_state = "FtpsOnly"
     http2_enabled = true
-    ip_restriction_default_action = "Deny"
 
     application_stack {
       python_version = "3.11"
