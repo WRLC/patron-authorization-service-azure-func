@@ -39,7 +39,7 @@ jobs:
 
     - name: Install dependencies
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-      run: poetry install --no-dev
+      run: poetry install --without dev
 
     - name: Build package with Poetry
       run: |
