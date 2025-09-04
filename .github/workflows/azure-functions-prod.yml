@@ -44,17 +44,16 @@ jobs:
       if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
       run: poetry install --without dev
 
-    - name: Build package with Poetry
-      run: |
-        poetry build
-        mkdir -p function-package
-        # Extract the wheel to get the package contents
-        poetry run pip install dist/*.whl --target function-package
-        # Copy function-specific files
-        cp -r function_app.py host.json requirements.txt function-package/ 2>/dev/null || true
-        cp -r local.settings.json function-package/ 2>/dev/null || true
-
     - name: Create deployment package
+      run: |
+        mkdir -p function-package
+        # Copy the virtual environment site-packages
+        cp -r .venv/lib/python*/site-packages/* function-package/
+        # Copy function-specific files
+        cp function_app.py host.json function-package/ 2>/dev/null || true
+        cp local.settings.json function-package/ 2>/dev/null || true
+
+    - name: Create zip package
       run: |
         cd function-package
         zip -r ../function-app.zip . -x "*.pyc" "__pycache__/*" "*.git*"
